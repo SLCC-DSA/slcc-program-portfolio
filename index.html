@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLCC Program Classification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #F6F6F6; /* SLCC Light Gray */
+            color: #333333;
+        }
+        h1, h2, h3 {
+            font-weight: 800; /* Montserrat ExtraBold */
+            color: #004277; /* SLCC Blue */
+        }
+        .font-semibold {
+            font-weight: 600; /* Montserrat SemiBold */
+        }
+        .slcc-blue { color: #004277; }
+        .slcc-light-blue { color: #0079C1; }
+        .slcc-gold { color: #F2A900; }
+        .slcc-gray { color: #666666; }
+
+        .border-high { border-left-color: #F2A900; }
+        .border-mid { border-left-color: #0079C1; }
+        .border-low { border-left-color: #666666; }
+        
+        .bg-high-light { background-color: #fef9e6; }
+        .bg-mid-light { background-color: #e6f2f9; }
+        .bg-low-light { background-color: #f0f0f0; }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background-color: #004277;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #002a4c;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl mb-3">SLCC Program Portfolio</h1>
+            <p class="text-lg md:text-xl slcc-light-blue max-w-4xl mx-auto">Classifying programs by post-completion value using the Aspen Unlocking Opportunity framework.</p>
+        </header>
+
+        <!-- Stats Section -->
+        <section id="stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="stat-card border-l-8 border-high">
+                <h2 class="text-4xl" id="high-count">0</h2>
+                <p class="font-semibold slcc-gold">High Opportunity</p>
+            </div>
+            <div class="stat-card border-l-8 border-mid">
+                <h2 class="text-4xl" id="mid-count">0</h2>
+                <p class="font-semibold slcc-light-blue">Mid Opportunity</p>
+            </div>
+            <div class="stat-card border-l-8 border-low">
+                <h2 class="text-4xl" id="low-count">0</h2>
+                <p class="font-semibold slcc-gray">Low Opportunity</p>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search" class="mb-8">
+            <input type="search" id="search-box" placeholder="Search by program name or code..." class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0079C1]">
+        </section>
+
+        <!-- Classification Key -->
+        <section class="mb-8 p-4 bg-white rounded-lg shadow">
+            <h3 class="text-xl mb-4">Classification Criteria</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold text-lg slcc-blue">Workforce Programs</h4>
+                    <ul class="list-disc list-inside text-sm text-[#333333] space-y-1 mt-2">
+                        <li><span class="slcc-gold font-semibold">High:</span> Median Hourly Wage >= $39.00</li>
+                        <li><span class="slcc-light-blue font-semibold">Mid:</span> Median Hourly Wage >= $24.00 (and < $39.00)</li>
+                        <li><span class="slcc-gray font-semibold">Low:</span> Median Hourly Wage < $24.00 (or data unavailable)</li>
+                        <li>Narrative includes 5-Year Job Change projection.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg slcc-blue">Transfer Programs</h4>
+                    <ul class="list-disc list-inside text-sm text-[#333333] space-y-1 mt-2">
+                        <li><span class="slcc-gold font-semibold">High:</span> Transfer Rate >= 50% AND Articulations >= 3</li>
+                        <li><span class="slcc-gray font-semibold">Low:</span> Does not meet BOTH high-value criteria.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Program List -->
+        <main id="program-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Program cards will be injected here by JavaScript -->
+            <div id="loading" class="text-center col-span-full py-12">
+                <h2 class="text-2xl slcc-blue">Loading Program Data...</h2>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <!-- Modal Overlay -->
+        <div id="modal-overlay" class="fixed inset-0 bg-black opacity-60"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-2xl z-10 max-h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="modal-title" class="text-xl">Labor Market Analysis</h3>
+                <button id="modal-close" class="text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6 overflow-y-auto text-gray-700">
+                <!-- Analysis text goes here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const WAGE_HIGH_THRESHOLD = 39.00;
+        const WAGE_MID_THRESHOLD = 24.00;
+        const TRANSFER_RATE_HIGH = 0.5; // 50%
+        const ARTICULATION_HIGH = 3;
+        const FEEDBACK_FORM_BASE_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=QamBA5gXtkyG3u0HyDpwQmKhyvduK15HuHVRwDKlprdUREMyQ1dPRjU2WEc4VTZaT0VUUUQzQkZNTyQlQCN0PWcu&rf06ea68c5aa44f16ac9455904cb0d0b4=";
+
+        let allPrograms = [];
+
+        // --- DATA LOADING & PARSING ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            document.getElementById('search-box').addEventListener('input', handleSearch);
+            setupModalListeners();
+        });
+
+        async function loadData() {
+            try {
+                const response = await fetch('programs.csv'); 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const programs = parseCSV(csvText);
+                allPrograms = classifyPrograms(programs);
+                renderPrograms(allPrograms);
+                updateStats(allPrograms);
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `<h2 class="text-2xl text-red-600">Error loading data. Please check file path and try again.</h2><p>${error}</p>`;
+                console.error("Failed to load program data:", error);
+            }
+        }
+
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+            const programs = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+
+                if (values.length === headers.length) {
+                    const program = {};
+                    headers.forEach((header, index) => {
+                        let value = values[index].trim();
+                        if (value.startsWith('"') && value.endsWith('"')) {
+                            value = value.substring(1, value.length - 1);
+                        }
+                        value = value.replace(/""/g, '"');
+                        program[header.replace(/\s+/g, '')] = value; 
+                    });
+                    programs.push(program);
+                }
+            }
+            return programs;
+        }
+
+        // --- CLASSIFICATION LOGIC ---
+        function classifyPrograms(programs) {
+            return programs.map(program => {
+                let classification = {};
+                if (program.ProgramType === 'Workforce') {
+                    classification = classifyWorkforce(program);
+                } else if (program.ProgramType === 'Tranfer') { 
+                    classification = classifyTransfer(program);
+                } else {
+                    classification = {
+                        class: 'Low',
+                        narrative: 'Classification pending. Program type is undefined.'
+                    };
+                }
+                program.classification = classification;
+                return program;
+            });
+        }
+
+        function classifyWorkforce(program) {
+            const wage = parseFloat(program.MedianHourly) || 0;
+            const jobChange = parseFloat(program['5YearJobChange'] || 0) * 100; 
+            let demandText = '';
+            
+            if (jobChange > 5) {
+                demandText = `Projected 5-year job demand is strong at <strong>+${jobChange.toFixed(1)}%</strong>.`;
+            } else if (jobChange > 0.1) {
+                demandText = `Projected 5-year job demand is growing at <strong>+${jobChange.toFixed(1)}%</strong>.`;
+            } else if (jobChange < -0.1) {
+                demandText = `Projected 5-year job demand is declining by <strong>${jobChange.toFixed(1)}%</strong>.`;
+            } else {
+                demandText = `Projected 5-year job demand is stable.`;
+            }
+            
+            if (wage >= WAGE_HIGH_THRESHOLD) {
+                return {
+                    class: 'High',
+                    narrative: `Classified as <strong>High Opportunity</strong>. Its median hourly wage of <strong>$${wage.toFixed(2)}</strong> exceeds the $39.00/hr benchmark. ${demandText}`
+                };
+            } else if (wage >= WAGE_MID_THRESHOLD) {
+                return {
+                    class: 'Mid',
+                    narrative: `Classified as <strong>Mid Opportunity</strong>. Its median hourly wage of <strong>$${wage.toFixed(2)}</strong> falls within the "stepping-stone" range (above $24.00/hr). ${demandText}`
+                };
+            } else {
+                const reason = wage > 0 ? `is below the $24.00/hr "stepping-stone" wage threshold.` : `is $0.00 or data is unavailable.`;
+                return {
+                    class: 'Low',
+                    narrative: `Classified as <strong>Low Opportunity</strong>. Its median hourly wage of <strong>$${wage.toFixed(2)}</strong> ${reason} ${demandText}`
+                };
+            }
+        }
+
+        function classifyTransfer(program) {
+            const grads = parseInt(program.FY24Grads) || 0;
+            const transferred = parseInt(program.Transferredin1Year) || 0;
+            const articulations = parseInt(program.Articulations) || 0;
+            const rate = (grads > 0) ? (transferred / grads) : 0;
+            const rateText = (grads > 0) ? `${(rate * 100).toFixed(0)}% (${transferred} of ${grads} grads)` : 'N/A (0 grads)';
+
+            if (rate >= TRANSFER_RATE_HIGH && articulations >= ARTICULATION_HIGH) {
+                return {
+                    class: 'High',
+                    narrative: `Classified as <strong>High Opportunity</strong>. It meets the high-value thresholds with a strong transfer rate of <strong>${rateText}</strong> (>= 50%) and <strong>${articulations}</strong> articulation agreements (>= 3).`
+                };
+            } else {
+                let reasons = [];
+                if (rate < TRANSFER_RATE_HIGH) {
+                    reasons.push(`its transfer rate of <strong>${rateText}</strong> is below the 50% threshold`);
+                }
+                if (articulations < ARTICULATION_HIGH) {
+                    reasons.push(`it has <strong>${articulations}</strong> articulation agreements (less than the 3 required)`);
+                }
+                const reasonText = reasons.length > 0 ? reasons.join(' and ') : 'it did not meet high-value thresholds';
+
+                return {
+                    class: 'Low',
+                    narrative: `Classified as <strong>Low Opportunity</strong>. It did not meet the high-value thresholds because ${reasonText}.`
+                };
+            }
+        }
+
+        // --- RENDERING & UI ---
+        function renderPrograms(programs) {
+            const container = document.getElementById('program-list');
+            container.innerHTML = '';
+
+            if (programs.length === 0) {
+                container.innerHTML = `<div class="text-center col-span-full py-12"><h2 class="text-2xl slcc-gray">No programs match your search.</h2></div>`;
+                return;
+            }
+
+            programs.forEach(program => {
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-lg shadow-lg overflow-hidden border-l-8 ${'border-' + program.classification.class.toLowerCase()} flex flex-col`;
+                
+                const analysisText = program.LaborMarketAnalysis;
+                const showAnalysisButton = program.ProgramType === 'Workforce' && analysisText && analysisText.trim() !== '0' && analysisText.trim() !== '';
+
+                const feedbackUrl = FEEDBACK_FORM_BASE_URL + encodeURIComponent(program.ProgramCode);
+
+                const cardContent = `
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-semibold mb-1">${program.Pogram}</h3>
+                            <span class="text-xs font-semibold px-2 py-1 rounded ${'bg-' + program.classification.class.toLowerCase() + '-light'} ${'text-' + program.classification.class.toLowerCase()}">${program.classification.class} Opp.</span>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-4">${program.ProgramCode} | ${program.Degee} in ${program.CIPArea}</p>
+
+                        <div class="text-sm text-[#333333] mb-4 p-4 rounded-md ${'bg-' + program.classification.class.toLowerCase() + '-light'}">
+                            <p>${program.classification.narrative}</p>
+                        </div>
+                        
+                        <h4 class="font-semibold text-sm slcc-blue mb-2">Key Metrics</h4>
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                            <div>
+                                <span class="text-gray-500 block">Program Type</span>
+                                <span class="font-semibold">${program.ProgramType}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 block">Enrolled (AY25)</span>
+                                <span class="font-semibold">${program.StudentsAY2025}</span>
+                            </div>
+                            ${program.ProgramType === 'Workforce' ? `
+                            <div>
+                                <span class="text-gray-500 block">Median Hourly</span>
+                                <span class="font-semibold">$${parseFloat(program.MedianHourly || 0).toFixed(2)}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 block">5-Yr Job Change</span>
+                                <span class="font-semibold">${(parseFloat(program['5YearJobChange'] || 0) * 100).toFixed(1)}%</span>
+                            </div>
+                            ` : `
+                            <div>
+                                <span class="text-gray-500 block">Transferred (FY24)</span>
+                                <span class="font-semibold">${program.Transferredin1Year} of ${program.FY24Grads}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500 block">Articulations</span>
+                                <span class="font-semibold">${program.Articulations}</span>
+                            </div>
+                            `}
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="p-4 bg-gray-50 border-t border-gray-100 flex items-center ${showAnalysisButton ? 'justify-between' : 'justify-end'} gap-2">
+                        ${showAnalysisButton ? `
+                        <button 
+                            class="btn btn-secondary open-modal-btn" 
+                            data-title="${program.Pogram}" 
+                            data-analysis="${encodeURIComponent(analysisText)}">
+                            View Analysis
+                        </button>
+                        ` : `<div></div>`}
+                        <a href="${feedbackUrl}" target="_blank" class="btn btn-primary">
+                            Provide Feedback
+                        </a>
+                    </div>
+                `;
+                card.innerHTML = cardContent;
+                container.appendChild(card);
+            });
+        }
+
+        function updateStats(programs) {
+            const highCount = programs.filter(p => p.classification.class === 'High').length;
+            const midCount = programs.filter(p => p.classification.class === 'Mid').length;
+            const lowCount = programs.filter(p => p.classification.class === 'Low').length;
+
+            document.getElementById('high-count').textContent = highCount;
+            document.getElementById('mid-count').textContent = midCount;
+            document.getElementById('low-count').textContent = lowCount;
+        }
+
+        function handleSearch(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredPrograms = allPrograms.filter(program => 
+                program.Pogram.toLowerCase().includes(searchTerm) ||
+                program.ProgramCode.toLowerCase().includes(searchTerm) ||
+                program.CIPArea.toLowerCase().includes(searchTerm)
+            );
+            renderPrograms(filteredPrograms);
+        }
+        
+        // --- MODAL LOGIC ---
+        function setupModalListeners() {
+            const modal = document.getElementById('modal-container');
+            const modalClose = document.getElementById('modal-close');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const programList = document.getElementById('program-list');
+
+            // Open modal (using event delegation)
+            programList.addEventListener('click', function(event) {
+                const button = event.target.closest('.open-modal-btn');
+                if (button) {
+                    const title = button.dataset.title;
+                    const analysis = decodeURIComponent(button.dataset.analysis);
+                    
+                    document.getElementById('modal-title').textContent = `Labor Market Analysis: ${title}`;
+                    document.getElementById('modal-body').textContent = analysis;
+                    modal.classList.remove('hidden');
+                }
+            });
+
+            // Close modal
+            const closeModal = () => {
+                modal.classList.add('hidden');
+            };
+            
+            modalClose.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', closeModal);
+        }
+
+    </script>
+</body>
+</html>
