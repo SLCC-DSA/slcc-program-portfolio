@@ -42,6 +42,16 @@
             text-align: center;
         }
         
+        .filter-card {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .filter-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
         .btn {
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -78,15 +88,15 @@
 
         <!-- Stats Section -->
         <section id="stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="stat-card border-l-8 border-high">
+            <div id="high-count-card" class="stat-card filter-card border-l-8 border-high">
                 <h2 class="text-4xl" id="high-count">0</h2>
                 <p class="font-semibold slcc-gold">High Opportunity</p>
             </div>
-            <div class="stat-card border-l-8 border-mid">
+            <div id="mid-count-card" class="stat-card filter-card border-l-8 border-mid">
                 <h2 class="text-4xl" id="mid-count">0</h2>
                 <p class="font-semibold slcc-light-blue">Mid Opportunity</p>
             </div>
-            <div class="stat-card border-l-8 border-low">
+            <div id="low-count-card" class="stat-card filter-card border-l-8 border-low">
                 <h2 class="text-4xl" id="low-count">0</h2>
                 <p class="font-semibold slcc-gray">Low Opportunity</p>
             </div>
@@ -156,12 +166,12 @@
         const FEEDBACK_FORM_BASE_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=QamBA5gXtkyG3u0HyDpwQmKhyvduK15HuHVRwDKlprdUREMyQ1dPRjU2WEc4VTZaT0VUUUQzQkZNTyQlQCN0PWcu&rf06ea68c5aa44f16ac9455904cb0d0b4=";
 
         let allPrograms = [];
+        let activeFilter = 'All'; // 'All', 'High', 'Mid', 'Low'
 
         // --- DATA LOADING & PARSING ---
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
-            document.getElementById('search-box').addEventListener('input', handleSearch);
-            setupModalListeners();
+            setupEventListeners();
         });
 
         async function loadData() {
@@ -173,13 +183,23 @@
                 const csvText = await response.text();
                 const programs = parseCSV(csvText);
                 allPrograms = classifyPrograms(programs);
-                renderPrograms(allPrograms);
-                updateStats(allPrograms);
+                applyFiltersAndRender(); // Replaces the old renderPrograms call
+                updateStats(allPrograms); // Stats always show totals
                 document.getElementById('loading').style.display = 'none';
             } catch (error) {
                 document.getElementById('loading').innerHTML = `<h2 class="text-2xl text-red-600">Error loading data. Please check file path and try again.</h2><p>${error}</p>`;
                 console.error("Failed to load program data:", error);
             }
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('search-box').addEventListener('input', applyFiltersAndRender);
+            setupModalListeners();
+            
+            // Filter card listeners
+            document.getElementById('high-count-card').addEventListener('click', () => handleFilterClick('High'));
+            document.getElementById('mid-count-card').addEventListener('click', () => handleFilterClick('Mid'));
+            document.getElementById('low-count-card').addEventListener('click', () => handleFilterClick('Low'));
         }
 
         function parseCSV(text) {
@@ -288,13 +308,70 @@
             }
         }
 
-        // --- RENDERING & UI ---
+        // --- FILTER & RENDER ---
+        
+        function handleFilterClick(filterValue) {
+            if (activeFilter === filterValue) {
+                activeFilter = 'All'; // Toggle off
+            } else {
+                activeFilter = filterValue; // Set new filter
+            }
+            applyFiltersAndRender();
+        }
+        
+        function applyFiltersAndRender() {
+            const searchTerm = document.getElementById('search-box').value.toLowerCase();
+            let programsToRender = allPrograms;
+
+            // 1. Apply Classification Filter
+            if (activeFilter !== 'All') {
+                programsToRender = programsToRender.filter(p => p.classification.class === activeFilter);
+            }
+
+            // 2. Apply Search Filter
+            if (searchTerm) {
+                programsToRender = programsToRender.filter(program => 
+                    program.Pogram.toLowerCase().includes(searchTerm) ||
+                    program.ProgramCode.toLowerCase().includes(searchTerm) ||
+                    program.CIPArea.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // 3. Render the result
+            renderPrograms(programsToRender); 
+
+            // 4. Update the visual state of the filter cards
+            updateActiveFilterVisuals();
+        }
+
+        function updateActiveFilterVisuals() {
+            const highCard = document.getElementById('high-count-card');
+            const midCard = document.getElementById('mid-count-card');
+            const lowCard = document.getElementById('low-count-card');
+            
+            const activeClasses = ['ring-4', 'ring-offset-2', 'ring-[#004277]'];
+            
+            // Clear all
+            highCard.classList.remove(...activeClasses);
+            midCard.classList.remove(...activeClasses);
+            lowCard.classList.remove(...activeClasses);
+
+            // Apply to active
+            if (activeFilter === 'High') {
+                highCard.classList.add(...activeClasses);
+            } else if (activeFilter === 'Mid') {
+                midCard.classList.add(...activeClasses);
+            } else if (activeFilter === 'Low') {
+                lowCard.classList.add(...activeClasses);
+            }
+        }
+
         function renderPrograms(programs) {
             const container = document.getElementById('program-list');
             container.innerHTML = '';
 
             if (programs.length === 0) {
-                container.innerHTML = `<div class="text-center col-span-full py-12"><h2 class="text-2xl slcc-gray">No programs match your search.</h2></div>`;
+                container.innerHTML = `<div class="text-center col-span-full py-12"><h2 class="text-2xl slcc-gray">No programs match your search or filter.</h2></div>`;
                 return;
             }
 
@@ -372,6 +449,7 @@
         }
 
         function updateStats(programs) {
+            // Stats always reflect the total dataset
             const highCount = programs.filter(p => p.classification.class === 'High').length;
             const midCount = programs.filter(p => p.classification.class === 'Mid').length;
             const lowCount = programs.filter(p => p.classification.class === 'Low').length;
@@ -379,16 +457,6 @@
             document.getElementById('high-count').textContent = highCount;
             document.getElementById('mid-count').textContent = midCount;
             document.getElementById('low-count').textContent = lowCount;
-        }
-
-        function handleSearch(event) {
-            const searchTerm = event.target.value.toLowerCase();
-            const filteredPrograms = allPrograms.filter(program => 
-                program.Pogram.toLowerCase().includes(searchTerm) ||
-                program.ProgramCode.toLowerCase().includes(searchTerm) ||
-                program.CIPArea.toLowerCase().includes(searchTerm)
-            );
-            renderPrograms(filteredPrograms);
         }
         
         // --- MODAL LOGIC ---
