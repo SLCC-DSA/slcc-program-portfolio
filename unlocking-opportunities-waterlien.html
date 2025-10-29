@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLCC Living Wage Standard Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #F6F6F6; /* SLCC Light Gray */
+            color: #333333;
+        }
+        h1, h2, h3 {
+            font-weight: 800; /* Montserrat ExtraBold */
+            color: #004277; /* SLCC Blue */
+        }
+        .font-semibold {
+            font-weight: 600; /* Montserrat SemiBold */
+        }
+        .slcc-blue { color: #004277; }
+        .slcc-light-blue { color: #0079C1; }
+        .slcc-gold { color: #F2A900; }
+        .slcc-gray { color: #666666; }
+
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 2rem;
+        }
+        .stat-card {
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl mb-3">Setting the Standard</h1>
+            <p class="text-lg md:text-xl slcc-light-blue max-w-4xl mx-auto">Establishing SLCC's Living Wage "Waterline" for Program Classification</p>
+        </header>
+
+        <!-- What is a Living Wage? -->
+        <section class="mb-12">
+            <div class="card max-w-4xl mx-auto text-center">
+                <h2 class="text-3xl mb-4">What is a Family-Sustaining Wage?</h2>
+                <p class="text-lg text-[#333333] leading-relaxed">As part of the Aspen Unlocking Opportunity initiative, our primary goal is to ensure that SLCC's workforce programs lead students to credentials of value. We define "value" as the ability to earn a wage that not only covers basic needs but also allows for savings, advancement, and economic mobility for a family. This is our "waterline" for program success.</p>
+            </div>
+        </section>
+
+        <!-- Why $39? -->
+        <section class="mb-12">
+            <div class="card">
+                <h2 class="text-3xl mb-6 text-center">Setting Our Waterline: Why $39.00/hr?</h2>
+                <p class="text-lg text-center text-[#333333] max-w-3xl mx-auto mb-8">Local research (EPI/MIT) indicates a true living wage for one adult and one child in Salt Lake County is <span class="font-semibold slcc-blue">$86,000/yr ($41.65/hr)</span>. However, national research from NCII defines a "Good Job" as topping out around <span class="font-semibold slcc-blue">$72,000/yr ($34.61/hr)</span>. We set our waterline at <span class="font-semibold slcc-gold text-xl">$81,120/yr ($39.00/hr)</span> as an ambitious and data-informed compromise, bridging the gap between a "Good Job" and the full living wage standard.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    <div class="bg-gray-50 rounded-lg p-6 border-b-4 border-gray-300">
+                        <h3 class="text-xl text-gray-500">"Good Job" Top Range (NCII)</h3>
+                        <p class="text-3xl font-semibold text-gray-700 mt-2">$72,000 /yr</p>
+                        <p class="text-lg text-gray-500">($34.61/hr)</p>
+                    </div>
+                    <div class="bg-yellow-50 rounded-lg p-6 border-b-4 border-yellow-400 scale-105 shadow-lg">
+                        <h3 class="text-xl slcc-gold">SLCC WATERLINE (Compromise)</h3>
+                        <p class="text-4xl font-semibold slcc-blue mt-2">$81,120 /yr</p>
+                        <p class="text-2xl slcc-blue">($39.00/hr)</p>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-6 border-b-4 border-blue-300">
+                        <h3 class="text-xl text-blue-500">Living Wage Standard (EPI/MIT)</h3>
+                        <p class="text-3xl font-semibold text-blue-700 mt-2">$86,000 /yr</p>
+                        <p class="text-lg text-blue-500">($41.65/hr)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Classification Tiers -->
+        <section class="mb-16">
+            <h2 class="text-3xl text-center mb-10">Our Program Classification Tiers</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="stat-card border-l-8 border-[#F2A900]">
+                    <h2 class="text-4xl" id="high-count">High Opportunity</h2>
+                    <p class="font-semibold slcc-gold text-2xl mt-3">>= $39.00 /hr</p>
+                    <p class="text-gray-600 mt-2">Programs meet or exceed our family-sustaining wage waterline.</p>
+                </div>
+                <div class="stat-card border-l-8 border-[#0079C1]">
+                    <h2 class="text-4xl" id="mid-count">Mid Opportunity</h2>
+                    <p class="font-semibold slcc-light-blue text-2xl mt-3">$24.00 - $38.99 /hr</p>
+                    <p class="text-gray-600 mt-2">"Stepping-stone" programs that lead to advancement but are below the waterline.</p>
+                </div>
+                <div class="stat-card border-l-8 border-[#666666]">
+                    <h2 class="text-4xl" id="low-count">Low Opportunity</h2>
+                    <p class="font-semibold slcc-gray text-2xl mt-3">< $24.00 /hr</p>
+                    <p class="text-gray-600 mt-2">Programs below the "stepping-stone" wage, requiring review.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost of Living Chart -->
+        <section class="mb-16">
+            <div class="card">
+                <h2 class="text-3xl text-center mb-6">Annual Cost of Living Breakdown</h2>
+                <p class="text-center text-gray-600 max-w-2xl mx-auto mb-8">This is the <span class="font-semibold">$86,000</span> annual budget (for one adult, one child in SL County) that informs our <span class="font-semibold">$41.65/hr</span> "Living Wage" target. Our waterline aims to get students as close to this as possible.</p>
+                <div class="chart-container">
+                    <canvas id="costOfLivingChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Factors -->
+        <section>
+            <h2 class="text-3xl text-center mb-10">Beyond Wages: Other Key Factors</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card">
+                    <h3 class="text-xl mb-3">Student Demographics</h3>
+                    <p class="text-gray-700">We must consider the typical family size of our students. Since a high proportion are parents, our wage threshold is based on a family unit (1 adult, 1 child), not just a single individual.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl mb-3">Job Demand & Growth</h3>
+                    <p class="text-gray-700">A high wage is only valuable if jobs are available. We analyze the 5-Year Job Change and local LMI data to ensure programs lead to high-opportunity <strong>and</strong> high-demand careers.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl mb-3">Transfer & Articulation</h3>
+                    <p class="text-gray-700">For transfer programs, value is measured differently. We analyze 1-year transfer rates and the number of articulation agreements to ensure seamless pathways to a bachelor's degree.</p>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="text-center text-sm text-gray-500 mt-16">
+            <p>Unofficial and for Internal Use only | Salt Lake Community College | institutional Effectiveness | October 29, 2025</p>
+            <p>Data sourced from MIT Living Wage Calculator, EPI Family Budget Calculator, and NCII.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('costOfLivingChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Housing', 'Food', 'Transportation', 'Healthcare', 'Child Care', 'Taxes', 'Other'],
+                    datasets: [{
+                        label: 'Annual Estimated Cost',
+                        data: [22450, 6120, 14200, 7180, 20400, 11500, 4150],
+                        backgroundColor: [
+                            '#004277', // SLCC Blue
+                            '#0079C1', // SLCC Light Blue
+                            '#F2A900', // SLCC Gold
+                            '#666666', // SLCC Gray
+                            '#005A8C', // Darker blue variant
+                            '#FFC72C', // Lighter gold variant
+                            '#AEAEAE'  // Lighter gray variant
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000) + 'k';
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Estimated Annual Costs for 1 Adult, 1 Child (SL County)',
+                            font: {
+                                size: 16,
+                                weight: '600'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: $${context.raw.toLocaleString()}`;
+                                },
+                                title: function(tooltipItems) {
+                                    return '';
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
