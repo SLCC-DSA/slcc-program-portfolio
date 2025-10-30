@@ -51,6 +51,16 @@
             transform: translateY(-4px);
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
+        
+        .icon-filter {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+        }
+        .icon-filter:hover {
+            background-color: #f0f0f0;
+        }
 
         .btn {
             padding: 0.5rem 1rem;
@@ -90,27 +100,23 @@
         <section id="stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div id="high-count-card" class="stat-card filter-card border-l-8 border-high">
                 <h2 class="text-4xl" id="high-count">0</h2>
-                <p class="font-semibold slcc-gold mb-2">High Opportunity</p>
-                <div id="high-breakdown" class="text-sm text-gray-600 leading-tight">
-                    <p><span id="high-workforce-count" class="font-semibold">0</span> Workforce</p>
-                    <p><span id="high-transfer-count" class="font-semibold">0</span> Transfer</p>
+                <p class="font-semibold slcc-gold">High Opportunity</p>
+                <div class="text-sm text-gray-500 mt-2">
+                    <span id="high-workforce-count">0 W</span> | <span id="high-transfer-count">0 T</span>
                 </div>
             </div>
             <div id="mid-count-card" class="stat-card filter-card border-l-8 border-mid">
                 <h2 class="text-4xl" id="mid-count">0</h2>
-                <p class="font-semibold slcc-light-blue mb-2">Mid Opportunity</p>
-                <!-- Placeholder for alignment -->
-                <div class="text-sm text-gray-600 leading-tight" style="visibility: hidden;">
-                    <p><span class="font-semibold">0</span> Workforce</p>
-                    <p><span class="font-semibold">0</span> Transfer</p>
+                <p class="font-semibold slcc-light-blue">Mid Opportunity</p>
+                <div class="text-sm text-gray-500 mt-2">
+                    (Mid-value workforce)
                 </div>
             </div>
             <div id="low-count-card" class="stat-card filter-card border-l-8 border-low">
                 <h2 class="text-4xl" id="low-count">0</h2>
-                <p class="font-semibold slcc-gray mb-2">Low Opportunity</p>
-                <div id="low-breakdown" class="text-sm text-gray-600 leading-tight">
-                    <p><span id="low-workforce-count" class="font-semibold">0</span> Workforce</p>
-                    <p><span id="low-transfer-count" class="font-semibold">0</span> Transfer</p>
+                <p class="font-semibold slcc-gray">Low Opportunity</p>
+                <div class="text-sm text-gray-500 mt-2">
+                    <span id="low-workforce-count">0 W</span> | <span id="low-transfer-count">0 T</span>
                 </div>
             </div>
         </section>
@@ -138,8 +144,22 @@
                     <ul class="list-disc list-inside text-sm text-[#333333] space-y-1 mt-2">
                         <li><span class="slcc-gold font-semibold">High:</span> Transfer Rate >= 50% AND Articulations >= 1</li>
                         <li><span class="slcc-gray font-semibold">Low:</span> Does not meet BOTH high-value criteria.</li>
-                        <li class="mt-2"><span class="slcc-gold font-semibold">&#9733; (Star)</span> = USHE High Yield Program</li>
                     </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Icon Legend Section -->
+        <section id="icon-legend" class="mb-8 p-4 bg-white rounded-lg shadow">
+            <h3 class="text-xl mb-2">Icon Legend <span class="text-sm font-normal text-gray-500">(Click to filter)</span></h3>
+            <div class="flex flex-col sm:flex-row sm:gap-8 text-sm text-[#333333]">
+                <div id="high-yield-filter" class="flex items-center icon-filter">
+                    <span class="slcc-gold font-semibold text-xl mr-2">&#9733;</span>
+                    <span>USHE High Yield Program</span>
+                </div>
+                <div id="discontinued-filter" class="flex items-center mt-2 sm:mt-0 icon-filter">
+                    <span class="text-red-600 font-semibold text-xl mr-2">&#128681;</span>
+                    <span>Program Discontinued (Teach-Out)</span>
                 </div>
             </div>
         </section>
@@ -176,11 +196,14 @@
         const WAGE_HIGH_THRESHOLD = 39.00;
         const WAGE_MID_THRESHOLD = 24.00;
         const TRANSFER_RATE_HIGH = 0.5; // 50%
-        const ARTICULATION_HIGH = 1; // Updated from 3 to 1
+        const ARTICULATION_HIGH = 1; // Updated from 3
         const FEEDBACK_FORM_BASE_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=QamBA5gXtkyG3u0HyDpwQmKhyvduK15HuHVRwDKlprdUREMyQ1dPRjU2WEc4VTZaT0VUUUQzQkZNTyQlQCN0PWcu&rf06ea68c5aa44f16ac9455904cb0d0b4=";
 
         let allPrograms = [];
         let activeFilter = 'All'; // 'All', 'High', 'Mid', 'Low'
+        let activeHighYieldFilter = false;
+        let activeDiscontinuedFilter = false;
+
 
         // --- DATA LOADING & PARSING ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -214,6 +237,10 @@
             document.getElementById('high-count-card').addEventListener('click', () => handleFilterClick('High'));
             document.getElementById('mid-count-card').addEventListener('click', () => handleFilterClick('Mid'));
             document.getElementById('low-count-card').addEventListener('click', () => handleFilterClick('Low'));
+            
+            // Icon filter listeners
+            document.getElementById('high-yield-filter').addEventListener('click', () => handleIconFilterClick('HighYield'));
+            document.getElementById('discontinued-filter').addEventListener('click', () => handleIconFilterClick('Discontinued'));
         }
 
         function parseCSV(text) {
@@ -232,7 +259,6 @@
                             value = value.substring(1, value.length - 1);
                         }
                         value = value.replace(/""/g, '"');
-                        // Use header.replace(/\s+/g, '') to create key, e.g., "High Yield" becomes "HighYield"
                         program[header.replace(/\s+/g, '')] = value; 
                     });
                     programs.push(program);
@@ -245,9 +271,10 @@
         function classifyPrograms(programs) {
             return programs.map(program => {
                 let classification = {};
+                // Use 'Transfer' (correct spelling)
                 if (program.ProgramType === 'Workforce') {
                     classification = classifyWorkforce(program);
-                } else if (program.ProgramType === 'Transfer') { // Now checking for the correct spelling "Transfer"
+                } else if (program.ProgramType === 'Transfer') { 
                     classification = classifyTransfer(program);
                 } else {
                     classification = {
@@ -334,6 +361,15 @@
             applyFiltersAndRender();
         }
         
+        function handleIconFilterClick(filterType) {
+            if (filterType === 'HighYield') {
+                activeHighYieldFilter = !activeHighYieldFilter;
+            } else if (filterType === 'Discontinued') {
+                activeDiscontinuedFilter = !activeDiscontinuedFilter;
+            }
+            applyFiltersAndRender();
+        }
+        
         function applyFiltersAndRender() {
             const searchTerm = document.getElementById('search-box').value.toLowerCase();
             let programsToRender = allPrograms;
@@ -342,8 +378,18 @@
             if (activeFilter !== 'All') {
                 programsToRender = programsToRender.filter(p => p.classification.class === activeFilter);
             }
+            
+            // 2. Apply High Yield Filter
+            if (activeHighYieldFilter) {
+                programsToRender = programsToRender.filter(p => p.HighYield === 'Yes');
+            }
 
-            // 2. Apply Search Filter
+            // 3. Apply Discontinued Filter
+            if (activeDiscontinuedFilter) {
+                programsToRender = programsToRender.filter(p => p.HB265Discontinued === 'Yes');
+            }
+
+            // 4. Apply Search Filter
             if (searchTerm) {
                 programsToRender = programsToRender.filter(program => 
                     program.Pogram.toLowerCase().includes(searchTerm) ||
@@ -352,10 +398,10 @@
                 );
             }
 
-            // 3. Render the result
+            // 5. Render the result
             renderPrograms(programsToRender); 
 
-            // 4. Update the visual state of the filter cards
+            // 6. Update the visual state of all filters
             updateActiveFilterVisuals();
         }
 
@@ -363,21 +409,36 @@
             const highCard = document.getElementById('high-count-card');
             const midCard = document.getElementById('mid-count-card');
             const lowCard = document.getElementById('low-count-card');
+            const highYieldCard = document.getElementById('high-yield-filter');
+            const discontinuedCard = document.getElementById('discontinued-filter');
             
-            const activeClasses = ['ring-4', 'ring-offset-2', 'ring-[#004277]'];
+            const activeCardClasses = ['ring-4', 'ring-offset-2', 'ring-[#004277]'];
+            const activeIconClasses = ['ring-2', 'ring-[#004277]', 'bg-blue-50'];
             
-            // Clear all
-            highCard.classList.remove(...activeClasses);
-            midCard.classList.remove(...activeClasses);
-            lowCard.classList.remove(...activeClasses);
+            // Clear all card filters
+            highCard.classList.remove(...activeCardClasses);
+            midCard.classList.remove(...activeCardClasses);
+            lowCard.classList.remove(...activeCardClasses);
+            
+            // Clear all icon filters
+            highYieldCard.classList.remove(...activeIconClasses);
+            discontinuedCard.classList.remove(...activeIconClasses);
 
-            // Apply to active
+            // Apply to active card filter
             if (activeFilter === 'High') {
-                highCard.classList.add(...activeClasses);
+                highCard.classList.add(...activeCardClasses);
             } else if (activeFilter === 'Mid') {
-                midCard.classList.add(...activeClasses);
+                midCard.classList.add(...activeCardClasses);
             } else if (activeFilter === 'Low') {
-                lowCard.classList.add(...activeClasses);
+                lowCard.classList.add(...activeCardClasses);
+            }
+            
+            // Apply to active icon filters
+            if (activeHighYieldFilter) {
+                highYieldCard.classList.add(...activeIconClasses);
+            }
+            if (activeDiscontinuedFilter) {
+                discontinuedCard.classList.add(...activeIconClasses);
             }
         }
 
@@ -386,7 +447,7 @@
             container.innerHTML = '';
 
             if (programs.length === 0) {
-                container.innerHTML = `<div class="text-center col-span-full py-12"><h2 class="text-2xl slcc-gray">No programs match your search or filter.</h2></div>`;
+                container.innerHTML = `<div class="text-center col-span-full py-12"><h2 class="text-2xl slcc-gray">No programs match your search or filters.</h2></div>`;
                 return;
             }
 
@@ -399,15 +460,20 @@
 
                 const feedbackUrl = FEEDBACK_FORM_BASE_URL + encodeURIComponent(program.ProgramCode);
                 
-                // NEW: Check for High Yield. We assume '1' means true.
-                const highYieldIcon = (program.HighYield === '1') 
+                // Check for High Yield. Now checks for "Yes"
+                const highYieldIcon = (program.HighYield === 'Yes') 
                     ? `<span class="slcc-gold ml-2" title="USHE High Yield Program">&#9733;</span>` 
+                    : '';
+                
+                // Check for Discontinued
+                const discontinuedIcon = (program.HB265Discontinued === 'Yes')
+                    ? `<span class="text-red-600 ml-2" title="Program in Teach-Out (Discontinued)">&#128681;</span>`
                     : '';
 
                 const cardContent = `
                     <div class="p-6 flex-grow">
                         <div class="flex justify-between items-start">
-                            <h3 class="text-xl font-semibold mb-1">${program.Pogram}${highYieldIcon}</h3>
+                            <h3 class="text-xl font-semibold mb-1">${program.Pogram}${highYieldIcon}${discontinuedIcon}</h3>
                             <span class="text-xs font-semibold px-2 py-1 rounded ${'bg-' + program.classification.class.toLowerCase() + '-light'} ${'text-' + program.classification.class.toLowerCase()}">${program.classification.class} Opp.</span>
                         </div>
                         <p class="text-sm text-gray-500 mb-4">${program.ProgramCode} | ${program.Degee} in ${program.CIPArea}</p>
@@ -470,32 +536,21 @@
 
         function updateStats(programs) {
             // Stats always reflect the total dataset
-            const highPrograms = programs.filter(p => p.classification.class === 'High');
-            const midPrograms = programs.filter(p => p.classification.class === 'Mid');
-            const lowPrograms = programs.filter(p => p.classification.class === 'Low');
+            const highProgs = programs.filter(p => p.classification.class === 'High');
+            const midProgs = programs.filter(p => p.classification.class === 'Mid');
+            const lowProgs = programs.filter(p => p.classification.class === 'Low');
 
-            const highCount = highPrograms.length;
-            const midCount = midPrograms.length;
-            const lowCount = lowPrograms.length;
+            document.getElementById('high-count').textContent = highProgs.length;
+            document.getElementById('mid-count').textContent = midProgs.length;
+            document.getElementById('low-count').textContent = lowProgs.length;
+            
+            // High opportunity breakdowns
+            document.getElementById('high-workforce-count').textContent = `${highProgs.filter(p => p.ProgramType === 'Workforce').length} W`;
+            document.getElementById('high-transfer-count').textContent = `${highProgs.filter(p => p.ProgramType === 'Transfer').length} T`;
 
-            document.getElementById('high-count').textContent = highCount;
-            document.getElementById('mid-count').textContent = midCount;
-            document.getElementById('low-count').textContent = lowCount;
-            
-            // --- New Breakdown Logic ---
-            const highWorkforce = highPrograms.filter(p => p.ProgramType === 'Workforce').length;
-            const highTransfer = highPrograms.filter(p => p.ProgramType === 'Transfer').length;
-            
-            const lowWorkforce = lowPrograms.filter(p => p.ProgramType === 'Workforce').length;
-            const lowTransfer = lowPrograms.filter(p => p.ProgramType === 'Transfer').length;
-            
-            // Populate High Breakdown
-            document.getElementById('high-workforce-count').textContent = highWorkforce;
-            document.getElementById('high-transfer-count').textContent = highTransfer;
-            
-            // Populate Low Breakdown
-            document.getElementById('low-workforce-count').textContent = lowWorkforce;
-            document.getElementById('low-transfer-count').textContent = lowTransfer;
+            // Low opportunity breakdowns
+            document.getElementById('low-workforce-count').textContent = `${lowProgs.filter(p => p.ProgramType === 'Workforce').length} W`;
+            document.getElementById('low-transfer-count').textContent = `${lowProgs.filter(p => p.ProgramType === 'Transfer').length} T`;
         }
         
         // --- MODAL LOGIC ---
@@ -530,6 +585,4 @@
     </script>
 </body>
 </html>
-
-
 
